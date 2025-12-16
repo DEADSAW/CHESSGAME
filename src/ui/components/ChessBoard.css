@@ -1,0 +1,154 @@
+/**
+ * Chess Master Pro - Chess Board CSS
+ * 
+ * Styles for the canvas-based chess board component
+ */
+
+.chess-board-container {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  aspect-ratio: 1 / 1;
+  max-width: min(100%, 80vh);
+  max-height: min(100%, 80vw);
+  margin: 0 auto;
+}
+
+.chess-board-canvas {
+  width: 100%;
+  height: 100%;
+  border-radius: var(--border-radius);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  cursor: pointer;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: none;
+}
+
+.chess-board-container[data-disabled="true"] .chess-board-canvas {
+  cursor: not-allowed;
+  opacity: 0.9;
+}
+
+/* Promotion Overlay */
+.promotion-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+  border-radius: var(--border-radius);
+  animation: fadeIn 0.15s ease-out;
+}
+
+.promotion-dialog {
+  background: var(--color-surface);
+  padding: 1.5rem;
+  border-radius: var(--border-radius-lg);
+  box-shadow: 0 12px 48px rgba(0, 0, 0, 0.4);
+  animation: scaleIn 0.15s ease-out;
+}
+
+.promotion-title {
+  text-align: center;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  margin-bottom: 1rem;
+}
+
+.promotion-pieces {
+  display: flex;
+  gap: 0.75rem;
+  justify-content: center;
+}
+
+.promotion-piece-btn {
+  padding: 0.5rem;
+  background: var(--color-bg);
+  border: 2px solid var(--color-border);
+  border-radius: var(--border-radius);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.promotion-piece-btn:hover {
+  background: var(--color-primary);
+  border-color: var(--color-primary);
+  transform: scale(1.1);
+}
+
+.promotion-piece-btn:active {
+  transform: scale(1.05);
+}
+
+.promotion-piece-btn canvas {
+  display: block;
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Touch device optimizations */
+@media (hover: none) {
+  .chess-board-canvas {
+    cursor: default;
+  }
+  
+  .promotion-piece-btn:hover {
+    transform: none;
+  }
+  
+  .promotion-piece-btn:active {
+    transform: scale(1.05);
+  }
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .chess-board-container {
+    max-width: 100%;
+    max-height: calc(100vh - 200px);
+  }
+  
+  .promotion-dialog {
+    padding: 1rem;
+  }
+  
+  .promotion-title {
+    font-size: 1rem;
+  }
+  
+  .promotion-pieces {
+    gap: 0.5rem;
+  }
+}

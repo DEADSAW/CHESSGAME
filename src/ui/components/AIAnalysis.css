@@ -1,0 +1,184 @@
+/**
+ * Chess Master Pro - AI Analysis CSS
+ */
+
+.ai-analysis {
+  background: var(--color-surface);
+  border-radius: var(--border-radius-lg);
+  box-shadow: var(--shadow-sm);
+  padding: 1rem 1.25rem;
+}
+
+.ai-analysis-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+}
+
+.ai-analysis-header h3 {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.thinking-badge {
+  font-size: 0.75rem;
+  padding: 0.25rem 0.5rem;
+  background: var(--color-primary);
+  color: white;
+  border-radius: var(--border-radius);
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.6;
+  }
+}
+
+.ai-analysis-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem 1rem;
+  color: var(--color-text-secondary);
+  text-align: center;
+}
+
+.ai-analysis-empty svg {
+  width: 48px;
+  height: 48px;
+  margin-bottom: 1rem;
+  opacity: 0.3;
+}
+
+.ai-analysis-empty p {
+  margin: 0;
+  font-size: 0.9rem;
+}
+
+/* Evaluation Bar */
+.eval-bar-container {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.eval-bar {
+  flex: 1;
+  height: 24px;
+  background: #333;
+  border-radius: var(--border-radius);
+  overflow: hidden;
+  position: relative;
+}
+
+.eval-bar-white {
+  height: 100%;
+  background: linear-gradient(90deg, #e8e8e8, #ffffff);
+  transition: width 0.3s ease;
+  border-radius: var(--border-radius);
+}
+
+.eval-score {
+  font-family: 'JetBrains Mono', 'Fira Code', monospace;
+  font-size: 1rem;
+  font-weight: 700;
+  min-width: 4rem;
+  text-align: right;
+}
+
+.eval-score[data-advantage="white"] {
+  color: var(--color-success);
+}
+
+.eval-score[data-advantage="black"] {
+  color: var(--color-error);
+}
+
+.eval-score[data-advantage="equal"] {
+  color: var(--color-text-secondary);
+}
+
+/* Stats Grid */
+.ai-stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 0.75rem;
+  background: var(--color-bg);
+  border-radius: var(--border-radius);
+}
+
+.stat-label {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--color-text-secondary);
+  margin-bottom: 0.25rem;
+}
+
+.stat-value {
+  font-family: 'JetBrains Mono', 'Fira Code', monospace;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.stat-value.highlight {
+  color: var(--color-primary);
+}
+
+/* Principal Variation */
+.pv-line {
+  padding: 0.75rem;
+  background: var(--color-bg);
+  border-radius: var(--border-radius);
+  font-size: 0.85rem;
+}
+
+.pv-label {
+  color: var(--color-text-secondary);
+  margin-right: 0.5rem;
+}
+
+.pv-moves {
+  font-family: 'JetBrains Mono', 'Fira Code', monospace;
+  color: var(--color-text-primary);
+  word-break: break-word;
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+  .ai-stats {
+    grid-template-columns: 1fr 1fr;
+  }
+  
+  .ai-stats .stat:last-child {
+    grid-column: span 2;
+  }
+  
+  .eval-bar-container {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.5rem;
+  }
+  
+  .eval-score {
+    text-align: center;
+  }
+}

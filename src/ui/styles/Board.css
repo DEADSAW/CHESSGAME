@@ -1,0 +1,139 @@
+/**
+ * Chess Master Pro - Canvas Board Styles
+ */
+
+.board-container {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.board-wrapper {
+  position: relative;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  box-shadow: var(--shadow-lg);
+}
+
+.board-canvas {
+  display: block;
+  cursor: pointer;
+}
+
+.board-canvas.dragging {
+  cursor: grabbing;
+}
+
+/* Coordinates */
+.board-coordinates {
+  position: absolute;
+  pointer-events: none;
+  font-family: 'Consolas', 'Monaco', monospace;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.coord-file {
+  position: absolute;
+  bottom: 4px;
+  width: 100%;
+  display: flex;
+  justify-content: space-around;
+  padding: 0 10px;
+}
+
+.coord-rank {
+  position: absolute;
+  left: 4px;
+  height: 100%;
+  display: flex;
+  flex-direction: column-reverse;
+  justify-content: space-around;
+  padding: 10px 0;
+}
+
+.coord-file span,
+.coord-rank span {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.board-coordinates.dark .coord-file span:nth-child(odd),
+.board-coordinates.dark .coord-rank span:nth-child(even) {
+  color: var(--board-dark);
+}
+
+.board-coordinates.dark .coord-file span:nth-child(even),
+.board-coordinates.dark .coord-rank span:nth-child(odd) {
+  color: var(--board-light);
+}
+
+.board-coordinates.flipped .coord-file {
+  flex-direction: row-reverse;
+}
+
+.board-coordinates.flipped .coord-rank {
+  flex-direction: column;
+}
+
+/* Promotion Dialog */
+.promotion-dialog {
+  position: absolute;
+  background: var(--bg-secondary);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-lg);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  z-index: 200;
+  animation: fadeIn var(--transition-fast);
+}
+
+.promotion-option {
+  width: 64px;
+  height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  transition: background var(--transition-fast);
+}
+
+.promotion-option:hover {
+  background: var(--accent-primary);
+}
+
+.promotion-option img,
+.promotion-option svg {
+  width: 48px;
+  height: 48px;
+}
+
+/* Board Controls */
+.board-controls {
+  display: flex;
+  gap: var(--spacing-sm);
+  margin-top: var(--spacing-md);
+}
+
+.board-controls button {
+  padding: var(--spacing-sm) var(--spacing-md);
+}
+
+/* Drag preview */
+.drag-preview {
+  position: fixed;
+  pointer-events: none;
+  z-index: 1000;
+  transform: translate(-50%, -50%);
+}
+
+.drag-preview img {
+  width: 64px;
+  height: 64px;
+  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.4));
+}
