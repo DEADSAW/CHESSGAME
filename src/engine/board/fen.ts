@@ -79,14 +79,7 @@ export function parseFen(fen: string): Position {
   const board = parsePiecePlacement(piecePlacement ?? '');
   
   // Parse side to move
-  const side = parseSideToMove(sideToMove ?? '');
-  
-  // Parse castling rights
-  const castlingRights = parseCastlingRights(castling ?? '');
-  
-  // Parse en passant square
-  const enPassantSquare = parseEnPassant(enPassant ?? '');
-  
+// ... existing exports
   // Parse halfmove clock (default to 0)
   const halfmoveClock = halfmove !== undefined ? parseInt(halfmove, 10) : 0;
   if (isNaN(halfmoveClock) || halfmoveClock < 0) {
@@ -241,6 +234,11 @@ export function toFen(position: Position): string {
   return parts.join(' ');
 }
 
+/** Convenience alias for FEN generation */
+export function positionToFen(position: Position): string {
+  return toFen(position);
+}
+
 /**
  * Generate the piece placement part of FEN
  */
@@ -322,6 +320,11 @@ export function validateFen(fen: string): { isValid: boolean; error?: string } {
       error: error instanceof Error ? error.message : 'Unknown error' 
     };
   }
+}
+
+/** Boolean helper for validation */
+export function isValidFen(fen: string): boolean {
+  return validateFen(fen).isValid;
 }
 
 /**

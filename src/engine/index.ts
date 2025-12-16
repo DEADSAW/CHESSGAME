@@ -44,7 +44,9 @@ export {
   STARTING_FEN,
   parseFen,
   toFen,
+  positionToFen,
   validateFen,
+  isValidFen,
   parseFenSafe,
 } from './board/fen';
 
@@ -56,6 +58,8 @@ export {
   makeMove,
   isMoveLegal,
   isInCheck,
+  isCheckmate,
+  isStalemate,
   isSquareAttacked,
 } from './moves/generator';
 

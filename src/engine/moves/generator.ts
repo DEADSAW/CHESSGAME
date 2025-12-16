@@ -719,6 +719,18 @@ export function generateLegalMoves(position: Position): Move[] {
   return pseudoLegalMoves.filter(move => isMoveLegal(position, move));
 }
 
+/** Checkmate helper: no legal moves and side is in check */
+export function isCheckmate(position: Position): boolean {
+  const legalMoves = generateLegalMoves(position);
+  return legalMoves.length === 0 && isInCheck(position.board, position.sideToMove);
+}
+
+/** Stalemate helper: no legal moves and side is not in check */
+export function isStalemate(position: Position): boolean {
+  const legalMoves = generateLegalMoves(position);
+  return legalMoves.length === 0 && !isInCheck(position.board, position.sideToMove);
+}
+
 /**
  * Get legal moves for a specific square
  */
