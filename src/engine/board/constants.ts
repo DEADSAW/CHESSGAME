@@ -113,6 +113,15 @@ export function getSquareColor(index: SquareIndex): 'light' | 'dark' {
   return (file + rank) % 2 === 0 ? 'dark' : 'light';
 }
 
+/**
+ * Check if a square is light colored
+ * @param file File index (0-7)
+ * @param rank Rank index (0-7)
+ */
+export function isLightSquare(file: number, rank: number): boolean {
+  return (file + rank) % 2 !== 0;
+}
+
 // ============================================================================
 // IMPORTANT SQUARE INDICES
 // ============================================================================

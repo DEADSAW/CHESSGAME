@@ -47,13 +47,11 @@ const gameController = new GameController();
 
 export const App: React.FC = () => {
   // Game state
-  const gameState = useGameState(gameController);
-  const boardState = useBoardState(gameController);
-  const gameControls = useGameControls(gameController);
-  const moveHistoryData = useMoveHistory(gameController);
-  const aiAnalysis = useAIAnalysis(gameController);
-  
-  // UI settings
+  const gameState = useGameState();
+  const boardState = useBoardState();
+  const gameControls = useGameControls();
+  const moveHistoryData = useMoveHistory();
+  const aiAnalysis = useAIAnalysis();
   const uiSettings = useUISettings();
   
   // Local state for settings panel
@@ -72,7 +70,7 @@ export const App: React.FC = () => {
   }, [gameControls, pendingMode, pendingDifficulty, pendingPlayerColor]);
   
   const handleMove = useCallback((move: Move) => {
-    boardState.makeMove(move);
+    boardState.attemptMove(move.from, move.to, move.promotion);
   }, [boardState]);
   
   const handleNavigate = useCallback((moveIndex: number) => {
@@ -118,8 +116,8 @@ export const App: React.FC = () => {
   // COMPUTED VALUES
   // ============================================================================
   
-  const isGameInProgress = gameState.moveCount > 0;
-  const isGameOver = gameState.gameResult !== GameResult.IN_PROGRESS;
+  const isGameInProgress = gameState.history.length > 1;
+  const isGameOver = gameState.gameResult !== GameResult.ONGOING;
   
   // Determine if it's the player's turn
   const isPlayerTurn = (() => {
@@ -176,62 +174,64 @@ export const App: React.FC = () => {
       
       {/* Main Content */}
       <main className="app-main">
-        {/* Left Panel - Board */}
-        <div className="board-section">
-          <StatusBar
-            sideToMove={gameState.position.sideToMove}
-            gameResult={gameState.gameResult}
-            gameMode={gameState.gameMode}
-            isCheck={gameState.position.isCheck}
-            isThinking={gameState.isThinking}
-            moveCount={gameState.moveCount}
-            onNewGame={() => setShowSettings(true)}
-            onUndo={gameControls.undo}
-            onRedo={gameControls.redo}
-            canUndo={gameState.canUndo}
-            canRedo={gameState.canRedo}
-            onFlipBoard={uiSettings.toggleFlip}
-          />
-          
-          <ChessBoard
-            position={gameState.position}
-            isFlipped={uiSettings.isFlipped}
-            onMove={handleMove}
-            lastMove={gameState.lastMove}
-            isPlayerTurn={isPlayerTurn && !isGameOver && !gameState.isThinking}
-            disabled={isGameOver || gameState.isThinking}
-          />
-        </div>
-        
-        {/* Right Panel - Info */}
-        <div className="info-section">
-          {showSettings ? (
-            <Settings
-              gameMode={pendingMode}
-              difficulty={pendingDifficulty}
-              playerColor={pendingPlayerColor}
-              onModeChange={setPendingMode}
-              onDifficultyChange={setPendingDifficulty}
-              onPlayerColorChange={setPendingPlayerColor}
-              onNewGame={handleNewGame}
-              isGameInProgress={isGameInProgress}
+        <div className="app-layout">
+          {/* Left Panel - Board */}
+          <div className="board-section">
+            <StatusBar
+              sideToMove={gameState.position.sideToMove}
+              gameResult={gameState.gameResult}
+              gameMode={gameState.gameMode}
+              isCheck={gameState.isCheck}
+              isThinking={gameState.isThinking}
+              moveCount={gameState.history.length - 1}
+              onNewGame={() => setShowSettings(true)}
+              onUndo={gameControls.undo}
+              onRedo={gameControls.redo}
+              canUndo={gameControls.canUndo}
+              canRedo={gameControls.canRedo}
+              onFlipBoard={uiSettings.toggleFlip}
             />
-          ) : (
-            <>
-              <MoveHistory
-                moves={moveHistoryData.moves}
-                currentMoveIndex={moveHistoryData.currentIndex}
-                onNavigate={handleNavigate}
+            
+            <ChessBoard
+              position={gameState.position}
+              isFlipped={uiSettings.isFlipped}
+              onMove={handleMove}
+              lastMove={gameState.lastMove}
+              isPlayerTurn={isPlayerTurn && !isGameOver && !gameState.isThinking}
+              disabled={isGameOver || gameState.isThinking}
+            />
+          </div>
+          
+          {/* Right Panel - Info */}
+          <div className="info-section">
+            {showSettings ? (
+              <Settings
+                gameMode={pendingMode}
+                difficulty={pendingDifficulty}
+                playerColor={pendingPlayerColor}
+                onModeChange={setPendingMode}
+                onDifficultyChange={setPendingDifficulty}
+                onPlayerColorChange={setPendingPlayerColor}
+                onNewGame={handleNewGame}
+                isGameInProgress={isGameInProgress}
               />
-              
-              {gameState.gameMode === GameModeEnum.VS_COMPUTER && (
-                <AIAnalysis
-                  searchResult={aiAnalysis.searchResult}
-                  isThinking={gameState.isThinking}
+            ) : (
+              <>
+                <MoveHistory
+                  moves={moveHistoryData.moveNotations}
+                  currentMoveIndex={moveHistoryData.currentIndex}
+                  onNavigate={handleNavigate}
                 />
-              )}
-            </>
-          )}
+                
+                {gameState.gameMode === GameModeEnum.VS_COMPUTER && (
+                  <AIAnalysis
+                    searchResult={aiAnalysis.lastSearchResult}
+                    isThinking={gameState.isThinking}
+                  />
+                )}
+              </>
+            )}
+          </div>
         </div>
       </main>
       

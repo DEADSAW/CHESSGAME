@@ -329,10 +329,13 @@ export function search(position: Position, options: SearchOptions): SearchResult
   return {
     bestMove: bestMove!,
     evaluation: bestEvaluation,
+    score: bestEvaluation,  // Alias
     evaluationBreakdown: breakdown,
     principalVariation: bestPv,
+    pv: bestPv,  // Alias
     depth: completedDepth,
     nodesSearched: state.nodesSearched,
+    nodes: state.nodesSearched,  // Alias
     timeMs,
     explanation,
   };

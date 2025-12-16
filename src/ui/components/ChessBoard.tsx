@@ -12,9 +12,9 @@
  */
 
 import React, { useRef, useEffect, useState, useCallback, useMemo } from 'react';
-import type { Position, Piece, Move, Square, PieceType } from '../../types';
+import type { Position, Piece, Move, PieceType } from '../../types';
 import { PieceType as PieceTypeEnum, Color } from '../../types';
-import { squareToIndex, indexToSquare, isLightSquare } from '../../engine/board/constants';
+import { notationToIndex as squareToIndex, indexToNotation as indexToSquare, isLightSquare } from '../../engine/board/constants';
 import { generateLegalMoves } from '../../engine/moves/generator';
 import { getPieceImage, preloadPieces } from './PieceRenderer';
 import './ChessBoard.css';
@@ -35,7 +35,7 @@ interface ChessBoardProps {
 
 interface DragState {
   piece: Piece;
-  fromSquare: Square;
+  fromSquare: number; // Use index instead of Square notation
   currentX: number;
   currentY: number;
 }
@@ -88,17 +88,17 @@ export const ChessBoard: React.FC<ChessBoardProps> = ({
   
   // State
   const [squareSize, setSquareSize] = useState(80);
-  const [selectedSquare, setSelectedSquare] = useState<Square | null>(null);
+  const [selectedSquare, setSelectedSquare] = useState<number | null>(null);
   const [dragState, setDragState] = useState<DragState | null>(null);
   const [showPromotion, setShowPromotion] = useState<{
-    from: Square;
-    to: Square;
+    from: number;
+    to: number;
     color: Color;
   } | null>(null);
   
   // Computed legal moves for selected piece
   const legalMoves = useMemo(() => {
-    if (!selectedSquare) return [];
+    if (selectedSquare === null) return [];
     return generateLegalMoves(position).filter(
       move => move.from === selectedSquare
     );
@@ -110,14 +110,12 @@ export const ChessBoard: React.FC<ChessBoardProps> = ({
   }, [position]);
   
   // Find king in check
-  const kingInCheck = useMemo((): Square | null => {
-    if (!position.isCheck) return null;
-    
+  const kingInCheck = useMemo((): number | null => {    
     // Find king of side to move
     for (let i = 0; i < 64; i++) {
       const piece = position.board[i];
       if (piece && piece.type === PieceTypeEnum.KING && piece.color === position.sideToMove) {
-        return indexToSquare(i) as Square;
+        return i;
       }
     }
     return null;
@@ -127,7 +125,7 @@ export const ChessBoard: React.FC<ChessBoardProps> = ({
   // COORDINATE CONVERSION
   // ============================================================================
   
-  const getSquareFromCoords = useCallback((x: number, y: number): Square | null => {
+  const getSquareFromCoords = useCallback((x: number, y: number): number | null => {
     const col = Math.floor(x / squareSize);
     const row = Math.floor(y / squareSize);
     
@@ -136,14 +134,12 @@ export const ChessBoard: React.FC<ChessBoardProps> = ({
     const file = isFlipped ? 7 - col : col;
     const rank = isFlipped ? row : 7 - row;
     
-    const files = 'abcdefgh';
-    return `${files[file]}${rank + 1}` as Square;
+    return rank * 8 + file;
   }, [squareSize, isFlipped]);
   
-  const getSquareCoords = useCallback((square: Square): { x: number; y: number } => {
-    const index = squareToIndex(square);
-    const file = index % 8;
-    const rank = Math.floor(index / 8);
+  const getSquareCoords = useCallback((squareIndex: number): { x: number; y: number } => {
+    const file = squareIndex % 8;
+    const rank = Math.floor(squareIndex / 8);
     
     const col = isFlipped ? 7 - file : file;
     const row = isFlipped ? rank : 7 - rank;
@@ -181,31 +177,30 @@ export const ChessBoard: React.FC<ChessBoardProps> = ({
         ctx.fillStyle = isLight ? selectedTheme.lightSquare : selectedTheme.darkSquare;
         ctx.fillRect(x, y, squareSize, squareSize);
         
-        const files = 'abcdefgh';
-        const square = `${files[file]}${rank + 1}` as Square;
+        const squareIndex = rank * 8 + file;
         
         // Last move highlight
-        if (lastMove && (lastMove.from === square || lastMove.to === square)) {
+        if (lastMove && (lastMove.from === squareIndex || lastMove.to === squareIndex)) {
           ctx.fillStyle = selectedTheme.lastMoveSquare;
           ctx.fillRect(x, y, squareSize, squareSize);
         }
         
         // Selected square highlight
-        if (selectedSquare === square) {
+        if (selectedSquare === squareIndex) {
           ctx.fillStyle = selectedTheme.selectedSquare;
           ctx.fillRect(x, y, squareSize, squareSize);
         }
         
         // King in check highlight
-        if (kingInCheck === square) {
+        if (kingInCheck === squareIndex) {
           ctx.fillStyle = selectedTheme.checkSquare;
           ctx.fillRect(x, y, squareSize, squareSize);
         }
         
         // Legal move highlight
-        const isLegalTarget = legalMoves.some(m => m.to === square);
+        const isLegalTarget = legalMoves.some(m => m.to === squareIndex);
         if (isLegalTarget) {
-          const piece = position.board[squareToIndex(square)];
+          const piece = position.board[squareIndex];
           ctx.fillStyle = selectedTheme.legalMoveSquare;
           
           if (piece) {
@@ -282,12 +277,10 @@ export const ChessBoard: React.FC<ChessBoardProps> = ({
       const piece = position.board[i];
       if (!piece) continue;
       
-      const square = indexToSquare(i) as Square;
-      
       // Skip dragged piece
-      if (dragState && dragState.fromSquare === square) continue;
+      if (dragState && dragState.fromSquare === i) continue;
       
-      const coords = getSquareCoords(square);
+      const coords = getSquareCoords(i);
       const pieceImage = getPieceImage(piece.type, piece.color, Math.round(pieceSize));
       
       ctx.drawImage(
@@ -383,7 +376,7 @@ export const ChessBoard: React.FC<ChessBoardProps> = ({
     };
   }, []);
   
-  const tryMove = useCallback((from: Square, to: Square, promotionPiece?: PieceType) => {
+  const tryMove = useCallback((from: number, to: number, promotionPiece?: PieceType) => {
     // Find matching legal move
     const move = allLegalMoves.find(m => {
       if (m.from !== from || m.to !== to) return false;
@@ -404,7 +397,7 @@ export const ChessBoard: React.FC<ChessBoardProps> = ({
       
       if (promoMove) {
         // Show promotion dialog
-        const piece = position.board[squareToIndex(from)];
+        const piece = position.board[from];
         if (piece) {
           setShowPromotion({ from, to, color: piece.color });
         }
@@ -419,11 +412,11 @@ export const ChessBoard: React.FC<ChessBoardProps> = ({
     const coords = getCanvasCoords(e);
     const square = getSquareFromCoords(coords.x, coords.y);
     
-    if (!square) return;
+    if (square === null) return;
     
-    const piece = position.board[squareToIndex(square)];
+    const piece = position.board[square];
     
-    if (selectedSquare) {
+    if (selectedSquare !== null) {
       // If clicking on a legal move target, make the move
       if (legalMoves.some(m => m.to === square)) {
         tryMove(selectedSquare, square);

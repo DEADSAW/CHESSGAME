@@ -38,8 +38,8 @@ export function parseCoordinate(position: Position, notation: string): Move | nu
   let to: SquareIndex;
   
   try {
-    from = notationToIndex(fromStr as `${string}${string}`);
-    to = notationToIndex(toStr as `${string}${string}`);
+    from = notationToIndex(fromStr as any);
+    to = notationToIndex(toStr as any);
   } catch {
     return null;
   }
@@ -231,7 +231,7 @@ export function parseSan(position: Position, san: string): Move | null {
   const destStr = cleanSan.substring(cleanSan.length - 2);
   let dest: SquareIndex;
   try {
-    dest = notationToIndex(destStr as `${string}${string}`);
+    dest = notationToIndex(destStr as any);
   } catch {
     return null;
   }

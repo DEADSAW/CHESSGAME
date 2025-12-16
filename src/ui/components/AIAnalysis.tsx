@@ -7,6 +7,7 @@
 
 import React from 'react';
 import type { SearchResult } from '../../types';
+import { indexToNotation } from '../../engine/board/constants';
 import './AIAnalysis.css';
 
 interface AIAnalysisProps {
@@ -67,10 +68,13 @@ export const AIAnalysis: React.FC<AIAnalysisProps> = ({
     );
   }
   
-  const score = searchResult?.score ?? 0;
+  const score = searchResult?.evaluation ?? searchResult?.score ?? 0;
   const depth = searchResult?.depth ?? 0;
-  const nodes = searchResult?.nodes ?? 0;
-  const pv = searchResult?.pv ?? [];
+  const nodes = searchResult?.nodesSearched ?? searchResult?.nodes ?? 0;
+  const pv = searchResult?.principalVariation ?? searchResult?.pv ?? [];
+  const bestMove = searchResult?.bestMove 
+    ? `${indexToNotation(searchResult.bestMove.from)}-${indexToNotation(searchResult.bestMove.to)}` 
+    : '-';
   
   return (
     <div className="ai-analysis">
@@ -104,7 +108,7 @@ export const AIAnalysis: React.FC<AIAnalysisProps> = ({
         </div>
         <div className="stat">
           <span className="stat-label">Best Move</span>
-          <span className="stat-value highlight">{searchResult?.bestMove || '-'}</span>
+          <span className="stat-value highlight">{bestMove}</span>
         </div>
       </div>
       
@@ -112,7 +116,10 @@ export const AIAnalysis: React.FC<AIAnalysisProps> = ({
       {pv.length > 0 && (
         <div className="pv-line">
           <span className="pv-label">Best line:</span>
-          <span className="pv-moves">{pv.slice(0, 6).join(' ')}{pv.length > 6 ? '...' : ''}</span>
+          <span className="pv-moves">
+            {pv.slice(0, 6).map((m, i) => `${indexToNotation(m.from)}-${indexToNotation(m.to)}`).join(' ')}
+            {pv.length > 6 ? '...' : ''}
+          </span>
         </div>
       )}
     </div>

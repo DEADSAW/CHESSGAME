@@ -40,11 +40,11 @@ export const StatusBar: React.FC<StatusBarProps> = ({
 }) => {
   // Get status message
   const getStatusMessage = (): string => {
-    if (gameResult !== GameResultEnum.IN_PROGRESS) {
+    if (gameResult !== GameResultEnum.ONGOING) {
       switch (gameResult) {
-        case GameResultEnum.WHITE_WINS:
+        case GameResultEnum.WHITE_WINS_CHECKMATE:
           return 'Checkmate! White wins';
-        case GameResultEnum.BLACK_WINS:
+        case GameResultEnum.BLACK_WINS_CHECKMATE:
           return 'Checkmate! Black wins';
         case GameResultEnum.DRAW_STALEMATE:
           return 'Draw by stalemate';
@@ -85,7 +85,7 @@ export const StatusBar: React.FC<StatusBarProps> = ({
     }
   };
   
-  const isGameOver = gameResult !== GameResultEnum.IN_PROGRESS;
+  const isGameOver = gameResult !== GameResultEnum.ONGOING;
   
   return (
     <div className="status-bar">

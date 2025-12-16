@@ -55,17 +55,20 @@ export type SquareNotation = `${File}${Rank}`;
  */
 export type SquareIndex = number;
 
-/** A square can either contain a piece or be empty (null) */
-export type Square = Piece | null;
+/** A board square content - can either contain a piece or be empty (null) */
+export type BoardSquare = Piece | null;
+
+/** A square position notation (like "e4") - used for UI */
+export type Square = SquareNotation | null;
 
 /** 
  * Board representation as a flat array of 64 squares
  * Index mapping: index = rank * 8 + file (where a=0, b=1, etc.)
  */
-export type Board = readonly Square[];
+export type Board = readonly BoardSquare[];
 
 /** Mutable board for internal operations */
-export type MutableBoard = Square[];
+export type MutableBoard = BoardSquare[];
 
 // ============================================================================
 // CASTLING RIGHTS
@@ -238,10 +241,13 @@ export interface EvaluationBreakdown {
 export interface SearchResult {
   readonly bestMove: Move;
   readonly evaluation: number;
+  readonly score: number;  // Alias for evaluation
   readonly evaluationBreakdown: EvaluationBreakdown;
   readonly principalVariation: PrincipalVariation;
+  readonly pv: readonly Move[];  // Alias for principalVariation
   readonly depth: number;
   readonly nodesSearched: number;
+  readonly nodes: number;  // Alias for nodesSearched
   readonly timeMs: number;
   /** Human-readable explanation of the move */
   readonly explanation: string[];

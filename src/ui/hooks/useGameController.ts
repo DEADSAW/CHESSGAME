@@ -4,12 +4,23 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { GameController, getGameController, GameControllerState } from '../../game';
+import type { GameMode, PlayStyle } from '../../types';
+
+/** Formatted move for display */
+export interface FormattedMove {
+  index: number;
+  notation: string;
+  san: string;  // Alias for notation
+  isWhite: boolean;
+  moveNumber: number;
+  isCheck?: boolean;
+  isCheckmate?: boolean;
+}
 
 /**
  * Custom hook for using the game controller with React state
  */
-export function useGameController(): {
-  state: GameControllerState;
+export function useGameController(): GameControllerState & {
   controller: GameController;
 } {
   const controller = getGameController();
@@ -27,14 +38,15 @@ export function useGameController(): {
     return unsubscribe;
   }, [controller]);
   
-  return { state, controller };
+  return { ...state, controller };
 }
 
 /**
  * Hook for board-specific state
  */
 export function useBoardState() {
-  const { state, controller } = useGameController();
+  const gameState = useGameController();
+  const { controller } = gameState;
   
   const selectSquare = useCallback((square: number) => {
     controller.selectSquare(square);
@@ -45,13 +57,13 @@ export function useBoardState() {
   }, [controller]);
   
   return {
-    position: state.position,
-    selectedSquare: state.selectedSquare,
-    legalMovesForSelected: state.legalMovesForSelected,
-    lastMove: state.lastMove,
-    isCheck: state.isCheck,
-    isThinking: state.isThinking,
-    gameResult: state.gameResult,
+    position: gameState.position,
+    selectedSquare: gameState.selectedSquare,
+    legalMovesForSelected: gameState.legalMovesForSelected,
+    lastMove: gameState.lastMove,
+    isCheck: gameState.isCheck,
+    isThinking: gameState.isThinking,
+    gameResult: gameState.gameResult,
     selectSquare,
     attemptMove,
   };
@@ -61,13 +73,15 @@ export function useBoardState() {
  * Hook for game controls
  */
 export function useGameControls() {
-  const { state, controller } = useGameController();
+  const gameState = useGameController();
+  const { controller } = gameState;
   
-  const newGame = useCallback((
-    mode: Parameters<typeof controller.newGame>[0],
-    options?: Parameters<typeof controller.newGame>[1]
-  ) => {
+  const newGame = useCallback((mode: GameMode, options?: any) => {
     controller.newGame(mode, options);
+  }, [controller]);
+
+  const startNewGame = useCallback((mode: GameMode, difficulty?: any, playerColor?: any) => {
+    controller.newGame(mode, { difficulty, playerColor });
   }, [controller]);
   
   const undo = useCallback(() => {
@@ -87,13 +101,14 @@ export function useGameControls() {
   }, [controller]);
   
   return {
-    gameMode: state.gameMode,
-    gameResult: state.gameResult,
-    difficulty: state.difficulty,
-    playStyle: state.playStyle,
+    gameMode: gameState.gameMode,
+    gameResult: gameState.gameResult,
+    difficulty: gameState.difficulty,
+    playStyle: gameState.playStyle,
     canUndo: controller.canUndo(),
     canRedo: controller.canRedo(),
     newGame,
+    startNewGame,
     undo,
     redo,
     resign,
@@ -107,16 +122,17 @@ export function useGameControls() {
  * Hook for move history
  */
 export function useMoveHistory() {
-  const { state } = useGameController();
+  const gameState = useGameController();
   
   return {
-    history: state.history,
-    currentIndex: state.currentHistoryIndex,
-    moveNotations: state.history
+    history: gameState.history,
+    currentIndex: gameState.currentHistoryIndex,
+    moveNotations: gameState.history
       .filter(entry => entry.move !== null)
-      .map((entry, i) => ({
+      .map((entry, i): FormattedMove => ({
         index: i,
         notation: entry.notation,
+        san: entry.notation,  // Alias
         isWhite: i % 2 === 0,
         moveNumber: Math.floor(i / 2) + 1,
       })),
@@ -127,10 +143,35 @@ export function useMoveHistory() {
  * Hook for AI analysis display
  */
 export function useAIAnalysis() {
-  const { state } = useGameController();
+  const gameState = useGameController();
   
   return {
-    lastSearchResult: state.lastSearchResult,
-    isThinking: state.isThinking,
+    lastSearchResult: gameState.lastSearchResult,
+    isThinking: gameState.isThinking,
+  };
+}
+
+/**
+ * Hook for UI settings
+ */
+export function useUISettings() {
+  const [theme, setTheme] = useState<'dark' | 'light'>('dark');
+  const [isFlipped, setIsFlipped] = useState(false);
+
+  const toggleTheme = useCallback(() => {
+    setTheme(prev => prev === 'dark' ? 'light' : 'dark');
+  }, []);
+
+  const toggleFlip = useCallback(() => {
+    setIsFlipped(prev => !prev);
+  }, []);
+
+  return {
+    theme,
+    isFlipped,
+    settings: { theme, isFlipped },
+    toggleTheme,
+    toggleFlip,
+    updateSettings: () => {},
   };
 }
