@@ -83,6 +83,7 @@
   flex: 1;
   display: flex;
   justify-content: center;
+  align-items: flex-start;
   padding: clamp(1rem, 2vw, 2rem);
 }
 
@@ -147,8 +148,11 @@
     grid-template-columns: 1fr;
   }
 
+  /* On narrower screens let the page scroll instead of clamping the side panel height */
   .info-section {
     max-height: none;
+    overflow: visible;
+    padding-right: 0;
   }
 }
 
