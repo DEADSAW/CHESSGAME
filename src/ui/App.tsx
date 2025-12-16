@@ -8,7 +8,7 @@
  * - Keyboard shortcuts
  */
 
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useState, useCallback, useMemo } from 'react';
 import { GameController } from '../game/GameController';
 import { 
   ChessBoard, 
@@ -130,6 +130,28 @@ export const App: React.FC = () => {
     return true;
   })();
   
+  // Board theme based on UI theme
+  const boardTheme = useMemo(() => {
+    if (uiSettings.theme === 'dark') {
+      return {
+        lightSquare: '#769656',
+        darkSquare: '#4a7c34',
+        selectedSquare: 'rgba(255, 255, 0, 0.5)',
+        legalMoveSquare: 'rgba(255, 255, 0, 0.3)',
+        lastMoveSquare: 'rgba(155, 199, 0, 0.5)',
+        checkSquare: 'rgba(255, 0, 0, 0.6)',
+      };
+    }
+    return {
+      lightSquare: '#f0d9b5',
+      darkSquare: '#b58863',
+      selectedSquare: 'rgba(20, 85, 30, 0.5)',
+      legalMoveSquare: 'rgba(20, 85, 30, 0.3)',
+      lastMoveSquare: 'rgba(255, 255, 0, 0.4)',
+      checkSquare: 'rgba(255, 0, 0, 0.5)',
+    };
+  }, [uiSettings.theme]);
+  
   // ============================================================================
   // RENDER
   // ============================================================================
@@ -199,6 +221,8 @@ export const App: React.FC = () => {
               lastMove={gameState.lastMove}
               isPlayerTurn={isPlayerTurn && !isGameOver && !gameState.isThinking}
               disabled={isGameOver || gameState.isThinking}
+              isThinking={gameState.isThinking}
+              selectedTheme={boardTheme}
             />
           </div>
           

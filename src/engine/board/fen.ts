@@ -78,8 +78,11 @@ export function parseFen(fen: string): Position {
   // Parse piece placement
   const board = parsePiecePlacement(piecePlacement ?? '');
   
-  // Parse side to move
-// ... existing exports
+  // Parse side to move / castling / en passant
+  const side = parseSideToMove(sideToMove ?? '');
+  const castlingRights = parseCastlingRights(castling ?? '-');
+  const enPassantSquare = parseEnPassant(enPassant ?? '-');
+
   // Parse halfmove clock (default to 0)
   const halfmoveClock = halfmove !== undefined ? parseInt(halfmove, 10) : 0;
   if (isNaN(halfmoveClock) || halfmoveClock < 0) {

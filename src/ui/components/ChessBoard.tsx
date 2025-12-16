@@ -30,6 +30,7 @@ interface ChessBoardProps {
   lastMove: Move | null;
   isPlayerTurn: boolean;
   disabled?: boolean;
+  isThinking?: boolean;
   selectedTheme?: BoardTheme;
 }
 
@@ -80,6 +81,7 @@ export const ChessBoard: React.FC<ChessBoardProps> = ({
   lastMove,
   isPlayerTurn,
   disabled = false,
+  isThinking = false,
   selectedTheme = DEFAULT_THEME,
 }) => {
   // Refs
@@ -508,6 +510,7 @@ export const ChessBoard: React.FC<ChessBoardProps> = ({
       ref={containerRef} 
       className="chess-board-container"
       data-disabled={disabled || !isPlayerTurn}
+      data-thinking={isThinking}
     >
       <canvas
         ref={canvasRef}

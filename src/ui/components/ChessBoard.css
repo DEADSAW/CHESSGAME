@@ -33,6 +33,10 @@
   opacity: 0.9;
 }
 
+.chess-board-container[data-thinking="true"] .chess-board-canvas {
+  cursor: wait;
+}
+
 /* Promotion Overlay */
 .promotion-overlay {
   position: absolute;

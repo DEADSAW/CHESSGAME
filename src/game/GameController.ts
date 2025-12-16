@@ -440,36 +440,50 @@ export class GameController {
    * Trigger the AI to make a move
    */
   private async triggerAiMove(): Promise<void> {
-    if (this.state.isThinking) return;
+    if (this.state.isThinking) {
+      console.log('[AI] Already thinking, ignoring trigger');
+      return;
+    }
     
+    console.log('[AI] Triggering AI move...');
     this.setState({ isThinking: true });
+    
+    // Add delay for realism (400ms)
+    await new Promise(resolve => setTimeout(resolve, 400));
     
     try {
       const worker = getEngineWorker();
+      const fen = toFen(this.state.position);
+      console.log('[AI] Setting position:', fen);
       
       // Set the position
-      worker.setPosition(toFen(this.state.position));
+      worker.setPosition(fen);
       
       // Search for best move
+      console.log('[AI] Starting search with difficulty:', this.state.difficulty);
       const result = await worker.search({
         difficulty: this.state.difficulty,
         playStyle: this.state.playStyle,
       });
       
+      console.log('[AI] Search complete, best move:', result.bestMove);
+      
       // Apply the move
       this.setState({ lastSearchResult: result });
       this.applyMove(result.bestMove);
     } catch (error) {
-      console.error('AI error:', error);
+      console.error('[AI] Error during search:', error);
       // Fallback: make a random legal move
       const legalMoves = generateLegalMoves(this.state.position);
       if (legalMoves.length > 0) {
         const randomMove = legalMoves[Math.floor(Math.random() * legalMoves.length)];
         if (randomMove) {
+          console.log('[AI] Using fallback random move');
           this.applyMove(randomMove);
         }
       }
     } finally {
+      console.log('[AI] Finished thinking');
       this.setState({ isThinking: false });
     }
   }

@@ -94,7 +94,10 @@ function handleSetPosition(fen: string): void {
  * Start a search on the current position
  */
 function handleSearch(options: SearchOptions): void {
+  console.log('[Worker] handleSearch called with options:', options);
+  
   if (isSearching) {
+    console.warn('[Worker] Search already in progress');
     postMessage({ type: 'error', message: 'Search already in progress' });
     return;
   }
@@ -103,6 +106,7 @@ function handleSearch(options: SearchOptions): void {
   shouldStop = false;
   
   try {
+    console.log('[Worker] Starting AI calculation...');
     // Run the AI calculation
     const result = calculateAiMove(
       currentPosition,
@@ -111,9 +115,11 @@ function handleSearch(options: SearchOptions): void {
     );
     
     if (!shouldStop) {
+      console.log('[Worker] Search complete, posting result:', result.bestMove);
       postMessage({ type: 'result', result });
     }
   } catch (error) {
+    console.error('[Worker] Search error:', error);
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
     postMessage({ type: 'error', message: `Search error: ${errorMessage}` });
   } finally {
