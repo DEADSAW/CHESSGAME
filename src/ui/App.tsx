@@ -212,6 +212,7 @@ export const App: React.FC = () => {
               canUndo={gameControls.canUndo}
               canRedo={gameControls.canRedo}
               onFlipBoard={uiSettings.toggleFlip}
+              playerColor={gameState.playerColor}
             />
             
             <ChessBoard
