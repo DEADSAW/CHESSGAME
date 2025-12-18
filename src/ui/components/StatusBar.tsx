@@ -44,6 +44,17 @@ export const StatusBar: React.FC<StatusBarProps> = ({
   const isPlayerTurn = gameMode === GameModeEnum.PASS_AND_PLAY || 
                        (gameMode === GameModeEnum.VS_COMPUTER && sideToMove === playerColor);
   
+  const isGameOver = gameResult !== GameResultEnum.ONGOING;
+  
+  // Helper to determine if we should show the turn hint
+  const shouldShowTurnHint = (): boolean => {
+    return !isGameOver && 
+           isPlayerTurn && 
+           !isThinking && 
+           moveCount === 0 && 
+           gameMode === GameModeEnum.VS_COMPUTER;
+  };
+  
   // Get status message
   const getStatusMessage = (): string => {
     if (gameResult !== GameResultEnum.ONGOING) {
@@ -105,8 +116,6 @@ export const StatusBar: React.FC<StatusBarProps> = ({
     }
   };
   
-  const isGameOver = gameResult !== GameResultEnum.ONGOING;
-  
   return (
     <div className="status-bar">
       <div className="status-info">
@@ -122,7 +131,7 @@ export const StatusBar: React.FC<StatusBarProps> = ({
           <div className="status-sub">
             <span className="game-mode">{getModeDisplay()}</span>
             {moveCount > 0 && <span className="move-count">Move {Math.ceil(moveCount / 2)}</span>}
-            {!isGameOver && isPlayerTurn && !isThinking && moveCount === 0 && gameMode === GameModeEnum.VS_COMPUTER && (
+            {shouldShowTurnHint() && (
               <span className="turn-hint">Click a piece to move</span>
             )}
           </div>
