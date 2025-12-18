@@ -96,6 +96,7 @@ export const Settings: React.FC<SettingsProps> = ({
           {/* Player Color Selection */}
           <div className="settings-section">
             <label className="settings-label">Play as</label>
+            <p className="settings-hint">Note: White always moves first in chess</p>
             <div className="color-buttons">
               <button
                 className={`color-btn white ${playerColor === ColorEnum.WHITE ? 'active' : ''}`}
@@ -103,6 +104,7 @@ export const Settings: React.FC<SettingsProps> = ({
               >
                 <div className="color-piece white" />
                 <span>White</span>
+                <span className="color-hint">You move first</span>
               </button>
               <button
                 className={`color-btn black ${playerColor === ColorEnum.BLACK ? 'active' : ''}`}
@@ -110,6 +112,7 @@ export const Settings: React.FC<SettingsProps> = ({
               >
                 <div className="color-piece black" />
                 <span>Black</span>
+                <span className="color-hint">AI moves first</span>
               </button>
             </div>
           </div>

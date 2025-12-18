@@ -22,6 +22,7 @@ interface StatusBarProps {
   canUndo: boolean;
   canRedo: boolean;
   onFlipBoard: () => void;
+  playerColor?: Color; // Add playerColor to determine if it's player's turn
 }
 
 export const StatusBar: React.FC<StatusBarProps> = ({
@@ -37,7 +38,23 @@ export const StatusBar: React.FC<StatusBarProps> = ({
   canUndo,
   canRedo,
   onFlipBoard,
+  playerColor,
 }) => {
+  // Determine if it's the player's turn
+  const isPlayerTurn = gameMode === GameModeEnum.PASS_AND_PLAY || 
+                       (gameMode === GameModeEnum.VS_COMPUTER && sideToMove === playerColor);
+  
+  const isGameOver = gameResult !== GameResultEnum.ONGOING;
+  
+  // Helper to determine if we should show the turn hint
+  const shouldShowTurnHint = (): boolean => {
+    return !isGameOver && 
+           isPlayerTurn && 
+           !isThinking && 
+           moveCount === 0 && 
+           gameMode === GameModeEnum.VS_COMPUTER;
+  };
+  
   // Get status message
   const getStatusMessage = (): string => {
     if (gameResult !== GameResultEnum.ONGOING) {
@@ -66,6 +83,20 @@ export const StatusBar: React.FC<StatusBarProps> = ({
     }
     
     const turnText = sideToMove === ColorEnum.WHITE ? 'White' : 'Black';
+    
+    // Show if it's player's turn in VS_COMPUTER mode
+    if (gameMode === GameModeEnum.VS_COMPUTER) {
+      if (isPlayerTurn) {
+        if (isCheck) {
+          return `Your turn (${turnText}) - You're in check!`;
+        }
+        return `Your turn - Move ${turnText}`;
+      } else {
+        return `AI's turn (${turnText})`;
+      }
+    }
+    
+    // Pass and play mode
     if (isCheck) {
       return `${turnText} is in check!`;
     }
@@ -85,13 +116,12 @@ export const StatusBar: React.FC<StatusBarProps> = ({
     }
   };
   
-  const isGameOver = gameResult !== GameResultEnum.ONGOING;
-  
   return (
     <div className="status-bar">
       <div className="status-info">
-        <div className="turn-indicator" data-color={sideToMove} data-gameover={isGameOver}>
+        <div className="turn-indicator" data-color={sideToMove} data-gameover={isGameOver} data-thinking={isThinking}>
           <div className="turn-piece" />
+          {isThinking && <div className="thinking-pulse" />}
         </div>
         <div className="status-text">
           <div className="status-main">
@@ -101,6 +131,9 @@ export const StatusBar: React.FC<StatusBarProps> = ({
           <div className="status-sub">
             <span className="game-mode">{getModeDisplay()}</span>
             {moveCount > 0 && <span className="move-count">Move {Math.ceil(moveCount / 2)}</span>}
+            {shouldShowTurnHint() && (
+              <span className="turn-hint">Click a piece to move</span>
+            )}
           </div>
         </div>
       </div>
